@@ -1,0 +1,36 @@
+# Optional: deploy Flowboard to Render (https://render.com) as a single web service.
+# Not deployed. To use it later: push the project to a Git repository, then in Render choose
+# New > Blueprint and select the repository. Review the plan and region before applying.
+#
+# SQLite needs a persistent disk, which requires a paid instance type. Without a disk the database is
+# wiped on every deploy/restart.
+services:
+  - type: web
+    name: flowboard
+    runtime: node
+    plan: starter
+    buildCommand: "echo 'No build step: Flowboard has zero npm dependencies'"
+    startCommand: node server/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "24.19.0"
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATA_DIR
+        value: /var/data/flowboard
+      - key: COOKIE_SECURE
+        value: auto
+      # Set SEED to "false" if you don't want the public demo accounts on a real deployment.
+      - key: SEED
+        value: "true"
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_BASE_URL
+        sync: false
+      - key: AI_MODEL
+        sync: false
+    disk:
+      name: flowboard-data
+      mountPath: /var/data
+      sizeGB: 1
